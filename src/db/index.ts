@@ -41,6 +41,7 @@ async function getClientInstance(): Promise<Client> {
   if (clientInstance) return clientInstance;
 
   try {
+    const { createClient } = await import("@libsql/client/web");
     if (
       dbUrl.startsWith("http:") ||
       dbUrl.startsWith("https:") ||
@@ -48,11 +49,9 @@ async function getClientInstance(): Promise<Client> {
       dbUrl.startsWith("ws:") ||
       dbUrl.startsWith("wss:")
     ) {
-      const { createClient } = await import("@libsql/client/web");
       clientInstance = createClient({ url: dbUrl });
     } else {
-      const { createClient } = await import("@libsql/client");
-      clientInstance = createClient({ url: dbUrl });
+      clientInstance = dummyClient;
     }
   } catch (err) {
     console.warn("Database client initialization warning, using dummy client:", err);
