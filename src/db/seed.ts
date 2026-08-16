@@ -309,7 +309,7 @@ export async function seedDatabase() {
       unitLabel: m.unit,
       preview: m.preview,
       channel: m.channel,
-      unread: m.unread,
+      unread: Boolean(m.unread),
       createdAt: now,
     }).onConflictDoNothing();
   }
