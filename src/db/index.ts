@@ -1,12 +1,21 @@
 import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
+import { createClient, type Client } from "@libsql/client";
 import * as schema from "./schema";
 
 const dbUrl = process.env.DATABASE_URL || "file:mynyumba.db";
 
-export const rawClient = createClient({
-  url: dbUrl,
-});
+const isBrowser = typeof window !== "undefined";
+
+export const rawClient: Client = isBrowser
+  ? ({
+      execute: async () => ({ rows: [], columns: [] }),
+      executeMultiple: async () => {},
+      transaction: async () => {},
+      close: () => {},
+    } as unknown as Client)
+  : createClient({
+      url: dbUrl,
+    });
 
 export const db = drizzle(rawClient, { schema });
 export type Database = typeof db;
@@ -14,6 +23,7 @@ export type Database = typeof db;
 let isInitPromise: Promise<void> | undefined;
 
 export async function ensureTablesExist() {
+  if (isBrowser) return;
   if (!isInitPromise) {
     isInitPromise = (async () => {
       await rawClient.executeMultiple(`

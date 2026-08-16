@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 export const DEFAULT_ORG_ID = "org_mynyumba_nairobi";
 
 export async function seedDatabase() {
+  if (typeof window !== "undefined") return;
   await ensureTablesExist();
 
   const [existingOrg] = await db
