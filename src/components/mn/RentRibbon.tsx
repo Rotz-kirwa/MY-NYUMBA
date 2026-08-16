@@ -10,7 +10,7 @@ import { CountUp } from "./Bits";
 export function RentRibbon() {
   const segs = rentSegments();
   const total = segs.reduce((s, x) => s + x.value, 0);
-  const outstanding = total - segs[0].value;
+  const outstanding = total - (segs[0]?.value ?? 0);
   const peak = Math.max(...collectionByDay);
   const today = 16;
 
@@ -20,7 +20,7 @@ export function RentRibbon() {
         <div>
           <p className="t-caption">Rent ribbon · August 2026 · 130 units</p>
           <p className="t-display-xl mt-2">
-            <CountUp value={segs[0].value} format={(n) => KSh(n)} />
+            <CountUp value={(segs[0]?.value ?? 0)} format={(n) => KSh(n)} />
           </p>
           <p className="t-body mt-1 text-muted-foreground">
             in from a billed roll of{" "}
@@ -103,7 +103,7 @@ export function RentRibbon() {
 
       <div className="grid grid-cols-2 divide-x divide-border border-t border-border sm:grid-cols-4">
         {[
-          ["Collection rate", `${Math.round((segs[0].value / total) * 100)}%`],
+          ["Collection rate", `${Math.round(((segs[0]?.value ?? 0) / total) * 100)}%`],
           ["Occupancy", `${Math.round((portfolio.occupied / portfolio.units) * 100)}%`],
           ["Avg. days to pay", "4.2"],
           ["M-Pesa share", "78%"],
