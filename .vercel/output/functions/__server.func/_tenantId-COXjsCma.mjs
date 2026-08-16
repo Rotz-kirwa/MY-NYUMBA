@@ -1,4 +1,4 @@
-import { g as Link } from "./_libs/@tanstack/react-router+[...].mjs";
+import { v as Link } from "./_libs/@tanstack/react-router+[...].mjs";
 import { n as require_jsx_runtime } from "./_libs/react+tanstack__react-query.mjs";
 import { a as PageHeader, i as Metric, n as Badge, o as Panel, t as AppShell } from "./_ssr/Bits-IW5hBAFw.mjs";
 import { t as Route } from "./_tenantId-CN-fgAH-.mjs";

@@ -1,4 +1,4 @@
-import { m as createFileRoute, p as lazyRouteComponent } from "./_libs/@tanstack/react-router+[...].mjs";
+import { g as createFileRoute, h as lazyRouteComponent } from "./_libs/@tanstack/react-router+[...].mjs";
 import { c as createServerFn } from "./_ssr/createServerFn-CIHAFgYl.mjs";
 import { t as createSsrRpc } from "./_ssr/createSsrRpc-BAbcmpPz.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/_propertyId-DZt9FWLB.js

@@ -1,4 +1,4 @@
-//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-BffN0bj8.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-cEAFHmle.js
 var tsrStartManifest = () => ({ routes: {
 	__root__: {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/__root.tsx",
@@ -19,19 +19,19 @@ var tsrStartManifest = () => ({ routes: {
 			"/tenants/",
 			"/units/"
 		],
-		preloads: ["/assets/index-C3wzjTiq.js", "/assets/jsx-runtime-BKllkxft.js"],
+		preloads: ["/assets/index-DdhgxoDZ.js", "/assets/jsx-runtime-BKllkxft.js"],
 		scripts: [{ attrs: {
 			type: "module",
 			async: !0,
-			src: "/assets/index-C3wzjTiq.js"
+			src: "/assets/index-DdhgxoDZ.js"
 		} }]
 	},
 	"/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/routes-DGjIwWXl.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/routes-Bl4V83C5.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/arrow-up-right-VONp2yz_.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
@@ -50,27 +50,27 @@ var tsrStartManifest = () => ({ routes: {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/properties/$propertyId.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/_propertyId-BPltx66x.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/_propertyId-D3Arsugs.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
 	},
 	"/tenants/$tenantId": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/tenants/$tenantId.tsx",
 		children: void 0,
-		preloads: ["/assets/_tenantId-C4vzP2Ge.js", "/assets/Bits-BIc0rofi.js"]
+		preloads: ["/assets/_tenantId-BDn68PIx.js", "/assets/Bits-BVQn1afn.js"]
 	},
 	"/documents/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/documents/index.tsx",
 		children: void 0,
-		preloads: ["/assets/documents-rjM_w7dH.js", "/assets/Bits-BIc0rofi.js"]
+		preloads: ["/assets/documents-ATvj6whU.js", "/assets/Bits-BVQn1afn.js"]
 	},
 	"/expenses/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/expenses/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/expenses-CWF5z_lm.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/expenses-DZbwUXlb.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
 	},
@@ -78,8 +78,8 @@ var tsrStartManifest = () => ({ routes: {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/leases/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/leases-Bxl6zsBk.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/leases-DD7a9P3v.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
 	},
@@ -87,22 +87,22 @@ var tsrStartManifest = () => ({ routes: {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/maintenance/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/maintenance-DiZpFZtT.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/maintenance-B8K0pBH4.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
 	},
 	"/messages/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/messages/index.tsx",
 		children: void 0,
-		preloads: ["/assets/messages-CVebg_qp.js", "/assets/Bits-BIc0rofi.js"]
+		preloads: ["/assets/messages-CsRGyrdO.js", "/assets/Bits-BVQn1afn.js"]
 	},
 	"/payments/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/payments/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/payments-C3iF5qbA.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/payments-BWiz2KoC.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/smartphone-B0z9dXVt.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
@@ -111,8 +111,8 @@ var tsrStartManifest = () => ({ routes: {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/properties/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/properties-DvYmTx3f.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/properties-DiKZ9ti_.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/arrow-up-right-VONp2yz_.js"
 		]
 	},
@@ -120,27 +120,27 @@ var tsrStartManifest = () => ({ routes: {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/reports/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/reports-B5P-3R7I.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/reports-uzq9Umuz.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
 	},
 	"/settings/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/settings/index.tsx",
 		children: void 0,
-		preloads: ["/assets/settings-CM1cnWQo.js", "/assets/Bits-BIc0rofi.js"]
+		preloads: ["/assets/settings-OOdkF9Sx.js", "/assets/Bits-BVQn1afn.js"]
 	},
 	"/tenants/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/tenants/index.tsx",
 		children: void 0,
-		preloads: ["/assets/tenants-PvH9B6By.js", "/assets/Bits-BIc0rofi.js"]
+		preloads: ["/assets/tenants-CtZZUs5r.js", "/assets/Bits-BVQn1afn.js"]
 	},
 	"/units/": {
 		filePath: "/home/user/NYOTA-Clients/kenya-keys/src/routes/units/index.tsx",
 		children: void 0,
 		preloads: [
-			"/assets/units-oO2M5IpE.js",
-			"/assets/Bits-BIc0rofi.js",
+			"/assets/units-BJQ1aQoq.js",
+			"/assets/Bits-BVQn1afn.js",
 			"/assets/mynyumba-DIDfPO4I.js"
 		]
 	}
