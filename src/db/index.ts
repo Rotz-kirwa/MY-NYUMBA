@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/libsql";
-import { createClient, type Client } from "@libsql/client";
+import type { Client } from "@libsql/client";
 import * as schema from "./schema";
 import path from "path";
 
@@ -27,16 +27,59 @@ function getDatabaseUrl(): string {
 const isBrowser = typeof window !== "undefined";
 const dbUrl = isBrowser ? "file::memory:" : getDatabaseUrl();
 
-export const rawClient: Client = isBrowser
-  ? ({
-      execute: async () => ({ rows: [], columns: [] }),
-      executeMultiple: async () => {},
-      transaction: async () => {},
-      close: () => {},
-    } as unknown as Client)
-  : createClient({
-      url: dbUrl,
-    });
+const dummyClient: Client = {
+  execute: async () => ({ rows: [], columns: [], columnTypes: [], rowsAffected: 0 }),
+  executeMultiple: async () => {},
+  transaction: async () => ({}) as any,
+  close: () => {},
+} as unknown as Client;
+
+let clientInstance: Client | undefined;
+
+async function getClientInstance(): Promise<Client> {
+  if (isBrowser) return dummyClient;
+  if (clientInstance) return clientInstance;
+
+  try {
+    if (
+      dbUrl.startsWith("http:") ||
+      dbUrl.startsWith("https:") ||
+      dbUrl.startsWith("libsql:") ||
+      dbUrl.startsWith("ws:") ||
+      dbUrl.startsWith("wss:")
+    ) {
+      const { createClient } = await import("@libsql/client/web");
+      clientInstance = createClient({ url: dbUrl });
+    } else {
+      const { createClient } = await import("@libsql/client");
+      clientInstance = createClient({ url: dbUrl });
+    }
+  } catch (err) {
+    console.warn("Native @libsql/client unavailable, attempting @libsql/client/web or memory fallback:", err);
+    try {
+      const { createClient } = await import("@libsql/client/web");
+      clientInstance = createClient({ url: "https://fallback.libsql.org" });
+    } catch {
+      clientInstance = dummyClient;
+    }
+  }
+
+  return clientInstance;
+}
+
+export const rawClient: Client = new Proxy({} as Client, {
+  get(_target, prop) {
+    return (...args: any[]) => {
+      return getClientInstance().then((client) => {
+        const fn = (client as any)[prop];
+        if (typeof fn === "function") {
+          return fn.apply(client, args);
+        }
+        return fn;
+      });
+    };
+  },
+});
 
 export const db = drizzle(rawClient, { schema });
 export type Database = typeof db;

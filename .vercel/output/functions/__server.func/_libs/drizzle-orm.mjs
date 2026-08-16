@@ -1,4 +1,4 @@
-import { t as createClient } from "./@libsql/client.mjs";
+import { n as createClient } from "./@libsql/client.mjs";
 //#region node_modules/drizzle-orm/entity.js
 var entityKind = Symbol.for("drizzle:entityKind");
 function is(value, type) {

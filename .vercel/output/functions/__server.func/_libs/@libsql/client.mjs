@@ -461,7 +461,7 @@ function expandConfig(config, preferHttp) {
 //#endregion
 //#region node_modules/@libsql/client/lib-esm/sqlite3.js
 /** @private */
-function _createClient$3(config) {
+function _createClient$4(config) {
 	if (config.scheme !== "file") throw new LibsqlError(`URL scheme ${JSON.stringify(config.scheme + ":")} is not supported by the local sqlite3 client. For more information, please read ${supportedUrlLink}`, "URL_SCHEME_NOT_SUPPORTED");
 	const authority = config.authority;
 	if (authority !== void 0) {
@@ -7809,7 +7809,7 @@ var import_promise_limit = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMi
 	};
 })))(), 1);
 /** @private */
-function _createClient$2(config) {
+function _createClient$3(config) {
 	if (config.scheme !== "wss" && config.scheme !== "ws") throw new LibsqlError(`The WebSocket client supports only "libsql:", "wss:" and "ws:" URLs, got ${JSON.stringify(config.scheme + ":")}. For more information, please read ${supportedUrlLink}`, "URL_SCHEME_NOT_SUPPORTED");
 	if (config.encryptionKey !== void 0) throw new LibsqlError("Encryption key is not supported by the remote client.", "ENCRYPTION_KEY_NOT_SUPPORTED");
 	if (config.scheme === "ws" && config.tls) throw new LibsqlError(`A "ws:" URL cannot opt into TLS by using ?tls=1`, "URL_INVALID");
@@ -8057,7 +8057,7 @@ var WsTransaction = class extends HranaTransaction {
 //#endregion
 //#region node_modules/@libsql/client/lib-esm/http.js
 /** @private */
-function _createClient$1(config) {
+function _createClient$2(config) {
 	if (config.scheme !== "https" && config.scheme !== "http") throw new LibsqlError(`The HTTP client supports only "libsql:", "https:" and "http:" URLs, got ${JSON.stringify(config.scheme + ":")}. For more information, please read ${supportedUrlLink}`, "URL_SCHEME_NOT_SUPPORTED");
 	if (config.encryptionKey !== void 0) throw new LibsqlError("Encryption key is not supported by the remote client.", "ENCRYPTION_KEY_NOT_SUPPORTED");
 	if (config.scheme === "http" && config.tls) throw new LibsqlError(`A "http:" URL cannot opt into TLS by using ?tls=1`, "URL_INVALID");
@@ -8227,17 +8227,39 @@ var HttpTransaction = class extends HranaTransaction {
 };
 //#endregion
 //#region node_modules/@libsql/client/lib-esm/node.js
+var node_exports = /* @__PURE__ */ __exportAll({
+	LibsqlBatchError: () => LibsqlBatchError,
+	LibsqlError: () => LibsqlError,
+	createClient: () => createClient$1
+});
 /** Creates a {@link Client} object.
 *
 * You must pass at least an `url` in the {@link Config} object.
 */
+function createClient$1(config) {
+	return _createClient$1(expandConfig(config, true));
+}
+function _createClient$1(config) {
+	if (config.scheme === "wss" || config.scheme === "ws") return _createClient$3(config);
+	else if (config.scheme === "https" || config.scheme === "http") return _createClient$2(config);
+	else return _createClient$4(config);
+}
+//#endregion
+//#region node_modules/@libsql/client/lib-esm/web.js
+var web_exports = /* @__PURE__ */ __exportAll({
+	LibsqlBatchError: () => LibsqlBatchError,
+	LibsqlError: () => LibsqlError,
+	_createClient: () => _createClient,
+	createClient: () => createClient
+});
 function createClient(config) {
 	return _createClient(expandConfig(config, true));
 }
+/** @private */
 function _createClient(config) {
-	if (config.scheme === "wss" || config.scheme === "ws") return _createClient$2(config);
-	else if (config.scheme === "https" || config.scheme === "http") return _createClient$1(config);
-	else return _createClient$3(config);
+	if (config.scheme === "ws" || config.scheme === "wss") return _createClient$3(config);
+	else if (config.scheme === "http" || config.scheme === "https") return _createClient$2(config);
+	else throw new LibsqlError(`The client that uses Web standard APIs supports only "libsql:", "wss:", "ws:", "https:" and "http:" URLs, got ${JSON.stringify(config.scheme + ":")}. For more information, please read ${supportedUrlLink}`, "URL_SCHEME_NOT_SUPPORTED");
 }
 //#endregion
-export { createClient as t };
+export { createClient$1 as n, node_exports as r, web_exports as t };
