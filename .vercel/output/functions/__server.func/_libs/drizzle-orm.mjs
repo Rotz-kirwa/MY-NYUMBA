@@ -4181,7 +4181,7 @@ function construct(client, config = {}) {
 	return db;
 }
 //#endregion
-//#region node_modules/drizzle-orm/libsql/driver.js
+//#region node_modules/drizzle-orm/libsql/web/index.js
 function drizzle(...params) {
 	if (typeof params[0] === "string") return construct(createClient({ url: params[0] }), params[1]);
 	if (isConfig(params[0])) {

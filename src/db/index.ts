@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/libsql";
-import type { Client } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql/web";
+import type { Client } from "@libsql/client/web";
 import * as schema from "./schema";
 import path from "path";
 
