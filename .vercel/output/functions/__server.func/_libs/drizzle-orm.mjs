@@ -634,6 +634,142 @@ Subquery.prototype.getSQL = function() {
 	return new SQL([this]);
 };
 //#endregion
+//#region node_modules/drizzle-orm/alias.js
+var ColumnAliasProxyHandler = class {
+	constructor(table) {
+		this.table = table;
+	}
+	static [entityKind] = "ColumnAliasProxyHandler";
+	get(columnObj, prop) {
+		if (prop === "table") return this.table;
+		return columnObj[prop];
+	}
+};
+var TableAliasProxyHandler = class {
+	constructor(alias, replaceOriginalName) {
+		this.alias = alias;
+		this.replaceOriginalName = replaceOriginalName;
+	}
+	static [entityKind] = "TableAliasProxyHandler";
+	get(target, prop) {
+		if (prop === Table.Symbol.IsAlias) return true;
+		if (prop === Table.Symbol.Name) return this.alias;
+		if (this.replaceOriginalName && prop === Table.Symbol.OriginalName) return this.alias;
+		if (prop === ViewBaseConfig) return {
+			...target[ViewBaseConfig],
+			name: this.alias,
+			isAlias: true
+		};
+		if (prop === Table.Symbol.Columns) {
+			const columns = target[Table.Symbol.Columns];
+			if (!columns) return columns;
+			const proxiedColumns = {};
+			Object.keys(columns).map((key) => {
+				proxiedColumns[key] = new Proxy(columns[key], new ColumnAliasProxyHandler(new Proxy(target, this)));
+			});
+			return proxiedColumns;
+		}
+		const value = target[prop];
+		if (is(value, Column)) return new Proxy(value, new ColumnAliasProxyHandler(new Proxy(target, this)));
+		return value;
+	}
+};
+function aliasedTable(table, tableAlias) {
+	return new Proxy(table, new TableAliasProxyHandler(tableAlias, false));
+}
+function aliasedTableColumn(column, tableAlias) {
+	return new Proxy(column, new ColumnAliasProxyHandler(new Proxy(column.table, new TableAliasProxyHandler(tableAlias, false))));
+}
+function mapColumnsInAliasedSQLToAlias(query, alias) {
+	return new SQL.Aliased(mapColumnsInSQLToAlias(query.sql, alias), query.fieldAlias);
+}
+function mapColumnsInSQLToAlias(query, alias) {
+	return sql.join(query.queryChunks.map((c) => {
+		if (is(c, Column)) return aliasedTableColumn(c, alias);
+		if (is(c, SQL)) return mapColumnsInSQLToAlias(c, alias);
+		if (is(c, SQL.Aliased)) return mapColumnsInAliasedSQLToAlias(c, alias);
+		return c;
+	}));
+}
+//#endregion
+//#region node_modules/drizzle-orm/errors.js
+var DrizzleError = class extends Error {
+	static [entityKind] = "DrizzleError";
+	constructor({ message, cause }) {
+		super(message);
+		this.name = "DrizzleError";
+		this.cause = cause;
+	}
+};
+var DrizzleQueryError = class DrizzleQueryError extends Error {
+	constructor(query, params, cause) {
+		super(`Failed query: ${query}
+params: ${params}`);
+		this.query = query;
+		this.params = params;
+		this.cause = cause;
+		Error.captureStackTrace(this, DrizzleQueryError);
+		if (cause) this.cause = cause;
+	}
+};
+var TransactionRollbackError = class extends DrizzleError {
+	static [entityKind] = "TransactionRollbackError";
+	constructor() {
+		super({ message: "Rollback" });
+	}
+};
+//#endregion
+//#region node_modules/drizzle-orm/logger.js
+var ConsoleLogWriter = class {
+	static [entityKind] = "ConsoleLogWriter";
+	write(message) {
+		console.log(message);
+	}
+};
+var DefaultLogger = class {
+	static [entityKind] = "DefaultLogger";
+	writer;
+	constructor(config) {
+		this.writer = config?.writer ?? new ConsoleLogWriter();
+	}
+	logQuery(query, params) {
+		const stringifiedParams = params.map((p) => {
+			try {
+				return JSON.stringify(p);
+			} catch {
+				return String(p);
+			}
+		});
+		const paramsStr = stringifiedParams.length ? ` -- params: [${stringifiedParams.join(", ")}]` : "";
+		this.writer.write(`Query: ${query}${paramsStr}`);
+	}
+};
+var NoopLogger = class {
+	static [entityKind] = "NoopLogger";
+	logQuery() {}
+};
+//#endregion
+//#region node_modules/drizzle-orm/query-promise.js
+var QueryPromise = class {
+	static [entityKind] = "QueryPromise";
+	[Symbol.toStringTag] = "QueryPromise";
+	catch(onRejected) {
+		return this.then(void 0, onRejected);
+	}
+	finally(onFinally) {
+		return this.then((value) => {
+			onFinally?.();
+			return value;
+		}, (reason) => {
+			onFinally?.();
+			throw reason;
+		});
+	}
+	then(onFulfilled, onRejected) {
+		return this.execute().then(onFulfilled, onRejected);
+	}
+};
+//#endregion
 //#region node_modules/drizzle-orm/utils.js
 function mapResultRow(columns, row, joinsNotNullableMap) {
 	const nullifyMap = {};
@@ -745,36 +881,6 @@ function isConfig(data) {
 	return false;
 }
 var textDecoder = typeof TextDecoder === "undefined" ? null : new TextDecoder();
-//#endregion
-//#region node_modules/drizzle-orm/logger.js
-var ConsoleLogWriter = class {
-	static [entityKind] = "ConsoleLogWriter";
-	write(message) {
-		console.log(message);
-	}
-};
-var DefaultLogger = class {
-	static [entityKind] = "DefaultLogger";
-	writer;
-	constructor(config) {
-		this.writer = config?.writer ?? new ConsoleLogWriter();
-	}
-	logQuery(query, params) {
-		const stringifiedParams = params.map((p) => {
-			try {
-				return JSON.stringify(p);
-			} catch {
-				return String(p);
-			}
-		});
-		const paramsStr = stringifiedParams.length ? ` -- params: [${stringifiedParams.join(", ")}]` : "";
-		this.writer.write(`Query: ${query}${paramsStr}`);
-	}
-};
-var NoopLogger = class {
-	static [entityKind] = "NoopLogger";
-	logQuery() {}
-};
 //#endregion
 //#region node_modules/drizzle-orm/pg-core/table.js
 var InlineForeignKeys$1 = Symbol.for("drizzle:PgInlineForeignKeys");
@@ -1101,64 +1207,6 @@ function mapRelationalRow(tablesConfig, tableConfig, row, buildQueryResultSelect
 	return result;
 }
 //#endregion
-//#region node_modules/drizzle-orm/alias.js
-var ColumnAliasProxyHandler = class {
-	constructor(table) {
-		this.table = table;
-	}
-	static [entityKind] = "ColumnAliasProxyHandler";
-	get(columnObj, prop) {
-		if (prop === "table") return this.table;
-		return columnObj[prop];
-	}
-};
-var TableAliasProxyHandler = class {
-	constructor(alias, replaceOriginalName) {
-		this.alias = alias;
-		this.replaceOriginalName = replaceOriginalName;
-	}
-	static [entityKind] = "TableAliasProxyHandler";
-	get(target, prop) {
-		if (prop === Table.Symbol.IsAlias) return true;
-		if (prop === Table.Symbol.Name) return this.alias;
-		if (this.replaceOriginalName && prop === Table.Symbol.OriginalName) return this.alias;
-		if (prop === ViewBaseConfig) return {
-			...target[ViewBaseConfig],
-			name: this.alias,
-			isAlias: true
-		};
-		if (prop === Table.Symbol.Columns) {
-			const columns = target[Table.Symbol.Columns];
-			if (!columns) return columns;
-			const proxiedColumns = {};
-			Object.keys(columns).map((key) => {
-				proxiedColumns[key] = new Proxy(columns[key], new ColumnAliasProxyHandler(new Proxy(target, this)));
-			});
-			return proxiedColumns;
-		}
-		const value = target[prop];
-		if (is(value, Column)) return new Proxy(value, new ColumnAliasProxyHandler(new Proxy(target, this)));
-		return value;
-	}
-};
-function aliasedTable(table, tableAlias) {
-	return new Proxy(table, new TableAliasProxyHandler(tableAlias, false));
-}
-function aliasedTableColumn(column, tableAlias) {
-	return new Proxy(column, new ColumnAliasProxyHandler(new Proxy(column.table, new TableAliasProxyHandler(tableAlias, false))));
-}
-function mapColumnsInAliasedSQLToAlias(query, alias) {
-	return new SQL.Aliased(mapColumnsInSQLToAlias(query.sql, alias), query.fieldAlias);
-}
-function mapColumnsInSQLToAlias(query, alias) {
-	return sql.join(query.queryChunks.map((c) => {
-		if (is(c, Column)) return aliasedTableColumn(c, alias);
-		if (is(c, SQL)) return mapColumnsInSQLToAlias(c, alias);
-		if (is(c, SQL.Aliased)) return mapColumnsInAliasedSQLToAlias(c, alias);
-		return c;
-	}));
-}
-//#endregion
 //#region node_modules/drizzle-orm/selection-proxy.js
 var SelectionProxyHandler = class SelectionProxyHandler {
 	static [entityKind] = "SelectionProxyHandler";
@@ -1193,27 +1241,6 @@ var SelectionProxyHandler = class SelectionProxyHandler {
 		}
 		if (typeof value !== "object" || value === null) return value;
 		return new Proxy(value, new SelectionProxyHandler(this.config));
-	}
-};
-//#endregion
-//#region node_modules/drizzle-orm/query-promise.js
-var QueryPromise = class {
-	static [entityKind] = "QueryPromise";
-	[Symbol.toStringTag] = "QueryPromise";
-	catch(onRejected) {
-		return this.then(void 0, onRejected);
-	}
-	finally(onFinally) {
-		return this.then((value) => {
-			onFinally?.();
-			return value;
-		}, (reason) => {
-			onFinally?.();
-			throw reason;
-		});
-	}
-	then(onFulfilled, onRejected) {
-		return this.execute().then(onFulfilled, onRejected);
 	}
 };
 //#endregion
@@ -1886,33 +1913,6 @@ var CasingCache = class {
 	clearCache() {
 		this.cache = {};
 		this.cachedTables = {};
-	}
-};
-//#endregion
-//#region node_modules/drizzle-orm/errors.js
-var DrizzleError = class extends Error {
-	static [entityKind] = "DrizzleError";
-	constructor({ message, cause }) {
-		super(message);
-		this.name = "DrizzleError";
-		this.cause = cause;
-	}
-};
-var DrizzleQueryError = class DrizzleQueryError extends Error {
-	constructor(query, params, cause) {
-		super(`Failed query: ${query}
-params: ${params}`);
-		this.query = query;
-		this.params = params;
-		this.cause = cause;
-		Error.captureStackTrace(this, DrizzleQueryError);
-		if (cause) this.cause = cause;
-	}
-};
-var TransactionRollbackError = class extends DrizzleError {
-	static [entityKind] = "TransactionRollbackError";
-	constructor() {
-		super({ message: "Rollback" });
 	}
 };
 //#endregion

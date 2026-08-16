@@ -34,14 +34,11 @@ const dummyClient: Client = {
   close: () => {},
 } as unknown as Client;
 
-let clientInstance: Client | undefined;
+import { createClient } from "@libsql/client/web";
 
-async function getClientInstance(): Promise<Client> {
+function initClient(): Client {
   if (isBrowser) return dummyClient;
-  if (clientInstance) return clientInstance;
-
   try {
-    const { createClient } = await import("@libsql/client/web");
     if (
       dbUrl.startsWith("http:") ||
       dbUrl.startsWith("https:") ||
@@ -49,31 +46,15 @@ async function getClientInstance(): Promise<Client> {
       dbUrl.startsWith("ws:") ||
       dbUrl.startsWith("wss:")
     ) {
-      clientInstance = createClient({ url: dbUrl });
-    } else {
-      clientInstance = dummyClient;
+      return createClient({ url: dbUrl });
     }
   } catch (err) {
     console.warn("Database client initialization warning, using dummy client:", err);
-    clientInstance = dummyClient;
   }
-
-  return clientInstance;
+  return dummyClient;
 }
 
-export const rawClient: Client = new Proxy({} as Client, {
-  get(_target, prop) {
-    return (...args: any[]) => {
-      return getClientInstance().then((client) => {
-        const fn = (client as any)[prop];
-        if (typeof fn === "function") {
-          return fn.apply(client, args);
-        }
-        return fn;
-      });
-    };
-  },
-});
+export const rawClient: Client = initClient();
 
 export const db = drizzle(rawClient, { schema });
 export type Database = typeof db;

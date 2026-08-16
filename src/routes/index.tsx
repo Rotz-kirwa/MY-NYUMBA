@@ -12,7 +12,6 @@ import { FinancialService } from "@/server/services/financial.service";
 import { OperationsService } from "@/server/services/operations.service";
 
 const getDashboardData = createServerFn({ method: "GET" }).handler(async () => {
-  await seedDatabase();
   const session = await getSessionContext();
   const props = await PropertyService.getAllProperties(session.organizationId, session.role);
   const finSummary = await FinancialService.getFinancialSummary(session.organizationId, session.role);

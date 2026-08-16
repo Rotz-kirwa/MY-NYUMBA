@@ -7878,12 +7878,6 @@ var HttpTransaction = class extends HranaTransaction {
 };
 //#endregion
 //#region node_modules/@libsql/client/lib-esm/web.js
-var web_exports = /* @__PURE__ */ __exportAll({
-	LibsqlBatchError: () => LibsqlBatchError,
-	LibsqlError: () => LibsqlError,
-	_createClient: () => _createClient,
-	createClient: () => createClient
-});
 function createClient(config) {
 	return _createClient(expandConfig(config, true));
 }
@@ -7894,4 +7888,4 @@ function _createClient(config) {
 	else throw new LibsqlError(`The client that uses Web standard APIs supports only "libsql:", "wss:", "ws:", "https:" and "http:" URLs, got ${JSON.stringify(config.scheme + ":")}. For more information, please read ${supportedUrlLink}`, "URL_SCHEME_NOT_SUPPORTED");
 }
 //#endregion
-export { web_exports as n, createClient as t };
+export { createClient as t };
