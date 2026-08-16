@@ -8,6 +8,18 @@ function getDatabaseUrl(): string {
   if (envUrl && !envUrl.startsWith("file:")) {
     return envUrl;
   }
+
+  // On Vercel or Serverless environments where working dir (/var/task) is read-only,
+  // SQLite must write database and journal/lock files to writable /tmp directory.
+  const isServerless =
+    Boolean(process.env.VERCEL) ||
+    Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+    Boolean(process.env.NETLIFY);
+
+  if (isServerless) {
+    return "file:/tmp/mynyumba.db";
+  }
+
   const fileName = envUrl ? envUrl.replace(/^file:/, "") : "mynyumba.db";
   return `file:${path.resolve(process.cwd(), fileName)}`;
 }
@@ -235,6 +247,9 @@ export async function ensureTablesExist() {
           created_at TEXT NOT NULL
         );
       `);
+
+      const { seedDatabase } = await import("./seed");
+      await seedDatabase();
     })();
   }
   return isInitPromise;
