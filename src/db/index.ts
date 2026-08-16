@@ -1,10 +1,19 @@
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient, type Client } from "@libsql/client";
 import * as schema from "./schema";
+import path from "path";
 
-const dbUrl = process.env.DATABASE_URL || "file:mynyumba.db";
+function getDatabaseUrl(): string {
+  const envUrl = process.env.DATABASE_URL;
+  if (envUrl && !envUrl.startsWith("file:")) {
+    return envUrl;
+  }
+  const fileName = envUrl ? envUrl.replace(/^file:/, "") : "mynyumba.db";
+  return `file:${path.resolve(process.cwd(), fileName)}`;
+}
 
 const isBrowser = typeof window !== "undefined";
+const dbUrl = isBrowser ? "file::memory:" : getDatabaseUrl();
 
 export const rawClient: Client = isBrowser
   ? ({
