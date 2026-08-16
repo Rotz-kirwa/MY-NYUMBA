@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: my-nyumba-saas
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: DATABASE_URL
+        value: file:mynyumba.db
+      - key: PORT
+        value: 10000
+      - key: MPESA_ENVIRONMENT
+        value: sandbox
+      - key: MPESA_CONSUMER_KEY
+        value: your_mpesa_consumer_key
+      - key: MPESA_CONSUMER_SECRET
+        value: your_mpesa_consumer_secret
+      - key: MPESA_PASSKEY
+        value: your_mpesa_passkey
+      - key: MPESA_SHORTCODE
+        value: "174379"
