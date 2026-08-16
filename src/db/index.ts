@@ -23,16 +23,22 @@ function createPgClient() {
 
 export const queryClient = createPgClient();
 
-export const db = queryClient
-  ? drizzle(queryClient, { schema })
-  : (new Proxy({}, {
-      get(_target, prop) {
-        if (prop === "then" || prop === "catch" || prop === "finally" || typeof prop === "symbol") {
-          return undefined;
-        }
-        return () => Promise.resolve([]);
-      },
-    }) as any);
+function createChainableProxy(): any {
+  const handler: ProxyHandler<any> = {
+    get(_target, prop) {
+      if (prop === "then") {
+        return (resolve: (val: any) => void) => resolve([]);
+      }
+      if (prop === "catch" || prop === "finally" || typeof prop === "symbol") {
+        return undefined;
+      }
+      return (..._args: any[]) => new Proxy({}, handler);
+    },
+  };
+  return new Proxy({}, handler);
+}
+
+export const db = queryClient ? drizzle(queryClient, { schema }) : (createChainableProxy() as any);
 
 export type Database = typeof db;
 
