@@ -18,6 +18,7 @@ import {
   Search,
   Bell,
   Plus,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,9 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         style={{ width: collapsed ? 72 : 264 }}
       >
         <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border px-4">
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-sidebar-primary font-display text-[15px] font-semibold text-sidebar-primary-foreground">
-            N
-          </span>
+          <img src="/favicon.png" alt="My Nyumba" className="size-8 shrink-0 rounded-xs object-cover shadow-sm" />
           <span
             className={cn(
               "font-display text-[17px] font-semibold tracking-tight text-sidebar-accent-foreground transition-opacity duration-150",
@@ -111,15 +110,27 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="flex h-12 items-center gap-3 border-t border-sidebar-border px-4 text-[13px] text-sidebar-foreground/60 transition-colors duration-150 hover:text-sidebar-accent-foreground"
-        >
-          {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
-          <span className={cn("transition-opacity duration-150", collapsed && "opacity-0")}>
-            Collapse
-          </span>
-        </button>
+        <div className="border-t border-sidebar-border p-2 space-y-1">
+          <Link
+            to="/login"
+            title={collapsed ? "Sign out" : undefined}
+            className="flex items-center gap-3 rounded-xs px-2 py-2 text-[13px] font-medium text-sidebar-foreground/70 transition-colors duration-150 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          >
+            <LogOut size={17} />
+            <span className={cn("truncate transition-opacity duration-150", collapsed && "pointer-events-none opacity-0")}>
+              Sign out
+            </span>
+          </Link>
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            className="flex w-full h-10 items-center gap-3 rounded-xs px-2 text-[13px] text-sidebar-foreground/60 transition-colors duration-150 hover:text-sidebar-accent-foreground"
+          >
+            {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+            <span className={cn("transition-opacity duration-150", collapsed && "opacity-0")}>
+              Collapse
+            </span>
+          </button>
+        </div>
       </aside>
 
       <div
@@ -130,9 +141,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="lg:pl-[var(--pl)]" style={{ ["--pl" as string]: `${collapsed ? 72 : 264}px` }}>
           <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border bg-background/85 px-4 backdrop-blur-sm sm:px-6">
             <div className="flex items-center gap-2 lg:hidden">
-              <span className="flex size-7 items-center justify-center rounded-xs bg-primary font-display text-sm font-semibold text-primary-foreground">
-                N
-              </span>
+              <img src="/favicon.png" alt="My Nyumba" className="size-7 shrink-0 rounded-xs object-cover shadow-sm" />
               <span className="font-display text-[15px] font-semibold">My Nyumba</span>
             </div>
 
@@ -163,6 +172,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <p className="text-[13px] font-semibold">Wanjiru Kimani</p>
                   <p className="text-[11px] text-muted-foreground">Portfolio manager</p>
                 </div>
+                <Link
+                  to="/login"
+                  title="Sign out"
+                  className="ml-1 flex size-8 items-center justify-center rounded-xs border border-border bg-card text-muted-foreground transition-colors hover:border-danger-soft hover:bg-danger-soft hover:text-danger"
+                >
+                  <LogOut size={15} />
+                </Link>
               </div>
             </div>
           </header>

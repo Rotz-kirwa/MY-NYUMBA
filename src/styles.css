@@ -80,50 +80,50 @@
 :root {
   --radius: 4px;
 
-  --background: oklch(0.951 0.014 85.5); /* #F3EFE7 bone */
-  --foreground: oklch(0.212 0.008 60);   /* #1A1815 ink */
-  --card: oklch(0.982 0.008 88);         /* #FCFAF5 surface */
-  --card-foreground: oklch(0.212 0.008 60);
-  --popover: oklch(0.982 0.008 88);
-  --popover-foreground: oklch(0.212 0.008 60);
+  --background: oklch(0.965 0.015 245); /* Ice Crisp Azure Tint #F2F5FA */
+  --foreground: oklch(0.18 0.04 255);    /* Midnight Navy Ink #0D172A */
+  --card: oklch(0.99 0.005 245);          /* Crisp White Surface #FAF8FE */
+  --card-foreground: oklch(0.18 0.04 255);
+  --popover: oklch(0.99 0.005 245);
+  --popover-foreground: oklch(0.18 0.04 255);
 
-  --primary: oklch(0.316 0.055 163);     /* #0B3B2E acacia */
-  --primary-foreground: oklch(0.972 0.014 88);
-  --secondary: oklch(0.925 0.013 85);
-  --secondary-foreground: oklch(0.316 0.055 163);
-  --muted: oklch(0.932 0.011 85);
-  --muted-foreground: oklch(0.52 0.012 70); /* #6E6960 */
-  --accent: oklch(0.918 0.023 80);
-  --accent-foreground: oklch(0.316 0.055 163);
+  --primary: oklch(0.42 0.18 255);       /* Deep Electric Royal Blue #0B4ED5 */
+  --primary-foreground: oklch(0.98 0.01 245);
+  --secondary: oklch(0.93 0.02 245);     /* Soft Blue Tint #E6ECF7 */
+  --secondary-foreground: oklch(0.38 0.16 255);
+  --muted: oklch(0.94 0.015 245);
+  --muted-foreground: oklch(0.50 0.04 255); /* #596B8A */
+  --accent: oklch(0.95 0.04 80);         /* Warm Gold Soft Tint #FEF7E6 */
+  --accent-foreground: oklch(0.42 0.18 255);
 
-  --ochre: oklch(0.687 0.135 68);        /* #D08A28 */
-  --ochre-soft: oklch(0.93 0.045 80);
+  --ochre: oklch(0.72 0.18 75);          /* Regal Gold Accent #E5A118 */
+  --ochre-soft: oklch(0.95 0.05 80);     /* Soft Amber Gold #FEF7E6 */
 
-  --success: oklch(0.512 0.093 158);     /* #2E7D52 */
-  --success-soft: oklch(0.915 0.038 160);
-  --warning: oklch(0.615 0.126 68);      /* #C97A0E */
-  --warning-soft: oklch(0.928 0.05 80);
-  --danger: oklch(0.463 0.155 30);       /* #A32C1E */
-  --danger-soft: oklch(0.92 0.037 32);
-  --info: oklch(0.482 0.06 231);         /* #2C5F7A */
-  --info-soft: oklch(0.925 0.024 230);
+  --success: oklch(0.52 0.14 150);       /* Emerald Success #1E8256 */
+  --success-soft: oklch(0.93 0.04 150);
+  --warning: oklch(0.68 0.17 75);        /* Gold Amber Warning #E29B12 */
+  --warning-soft: oklch(0.94 0.05 75);
+  --danger: oklch(0.48 0.16 28);         /* Regal Crimson #B82C1B */
+  --danger-soft: oklch(0.93 0.04 28);
+  --info: oklch(0.48 0.18 250);          /* Vibrant Cobalt Blue #1B65D4 */
+  --info-soft: oklch(0.93 0.03 250);
 
   --destructive: var(--danger);
-  --destructive-foreground: oklch(0.98 0.01 88);
+  --destructive-foreground: oklch(0.98 0.01 245);
 
-  --border: oklch(0.882 0.014 82);
-  --border-strong: oklch(0.79 0.017 82);
-  --input: oklch(0.882 0.014 82);
-  --ring: oklch(0.316 0.055 163);
+  --border: oklch(0.89 0.02 245);        /* Soft Metallic Border #D5DFEE */
+  --border-strong: oklch(0.80 0.03 245);
+  --input: oklch(0.89 0.02 245);
+  --ring: oklch(0.42 0.18 255);
 
-  --sidebar: oklch(0.246 0.038 163);
-  --sidebar-foreground: oklch(0.9 0.018 90);
-  --sidebar-primary: oklch(0.687 0.135 68);
-  --sidebar-primary-foreground: oklch(0.18 0.02 160);
-  --sidebar-accent: oklch(0.312 0.04 163);
-  --sidebar-accent-foreground: oklch(0.972 0.014 88);
-  --sidebar-border: oklch(0.33 0.033 163);
-  --sidebar-ring: oklch(0.687 0.135 68);
+  --sidebar: oklch(0.20 0.07 255);       /* Deep Sapphire Royal Navy #07152E */
+  --sidebar-foreground: oklch(0.92 0.02 245);
+  --sidebar-primary: oklch(0.72 0.18 75);  /* Regal Gold #E5A118 */
+  --sidebar-primary-foreground: oklch(0.12 0.05 255);
+  --sidebar-accent: oklch(0.28 0.10 255); /* Luminous Sapphire Highlight #0F2D5C */
+  --sidebar-accent-foreground: oklch(0.98 0.01 245);
+  --sidebar-border: oklch(0.28 0.07 255);
+  --sidebar-ring: oklch(0.72 0.18 75);
 }
 
 @layer base {

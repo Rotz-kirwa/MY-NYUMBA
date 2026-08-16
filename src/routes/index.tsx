@@ -2,17 +2,44 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/mn/Shell";
 import { RentRibbon } from "@/components/mn/RentRibbon";
 import { Badge, Metric, Panel, Table, Td, CountUp, statusVariant } from "@/components/mn/Bits";
-import {
-  KSh,
-  payments,
-  properties,
-  tickets,
-  monthlySeries,
-  portfolio,
-} from "@/lib/mynyumba";
+import { KSh, monthlySeries } from "@/lib/mynyumba";
 import { ArrowUpRight } from "lucide-react";
+import { createServerFn } from "@tanstack/react-start";
+import { getSessionContext } from "@/server/auth";
+import { seedDatabase } from "@/db/seed";
+import { PropertyService } from "@/server/services/property.service";
+import { FinancialService } from "@/server/services/financial.service";
+import { OperationsService } from "@/server/services/operations.service";
+
+const getDashboardData = createServerFn({ method: "GET" }).handler(async () => {
+  await seedDatabase();
+  const session = await getSessionContext();
+  const props = await PropertyService.getAllProperties(session.organizationId, session.role);
+  const finSummary = await FinancialService.getFinancialSummary(session.organizationId, session.role);
+  const payments = await FinancialService.getPayments(session.organizationId, session.role);
+  const rentCharges = await FinancialService.getRentCharges(session.organizationId, session.role);
+  const tickets = await OperationsService.getMaintenanceRequests(session.organizationId, session.role);
+
+  const totalUnits = props.reduce((s, p) => s + p.totalUnits, 0);
+  const occupiedUnits = props.reduce((s, p) => s + p.occupiedUnits, 0);
+  const vacantUnits = totalUnits - occupiedUnits;
+  const arrears = rentCharges.filter((c) => c.status !== "PAID");
+
+  return {
+    props,
+    finSummary,
+    payments,
+    rentCharges,
+    tickets,
+    totalUnits,
+    occupiedUnits,
+    vacantUnits,
+    arrears,
+  };
+});
 
 export const Route = createFileRoute("/")({
+  loader: () => getDashboardData(),
   head: () => ({
     meta: [
       { title: "My Nyumba — Nairobi rent collection dashboard" },
@@ -32,7 +59,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const arrears = payments.filter((p) => p.status !== "paid");
+  const data = Route.useLoaderData();
+
   const max = Math.max(...monthlySeries.map((m) => m.billed));
 
   return (
@@ -42,16 +70,22 @@ function Dashboard() {
           <p className="t-caption">Monday, 17 August 2026 · Nairobi</p>
           <h1 className="t-display-lg mt-1.5">Habari, Wanjiru</h1>
           <p className="t-body mt-1 text-muted-foreground">
-            Seven properties, {portfolio.units} units. Two payment promises fall due today.
+            {data.props.length} properties, {data.totalUnits} units. Two payment promises fall due today.
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="rounded-xs border border-border-strong bg-card px-3 py-2 text-[13px] font-semibold transition-colors duration-150 hover:bg-muted">
+          <Link
+            to="/payments"
+            className="rounded-xs border border-border-strong bg-card px-3 py-2 text-[13px] font-semibold transition-colors duration-150 hover:bg-muted"
+          >
             Send rent reminders
-          </button>
-          <button className="rounded-xs bg-primary px-3 py-2 text-[13px] font-semibold text-primary-foreground transition-opacity duration-150 hover:opacity-90">
+          </Link>
+          <Link
+            to="/payments"
+            className="rounded-xs bg-primary px-3 py-2 text-[13px] font-semibold text-primary-foreground transition-opacity duration-150 hover:opacity-90"
+          >
             Reconcile M-Pesa
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -60,14 +94,14 @@ function Dashboard() {
       <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
           label="Arrears carried"
-          value={<CountUp value={612_000} format={(n) => KSh(n)} />}
-          note="14 units · oldest 63 days"
+          value={<CountUp value={data.finSummary.arrearsCarried} format={(n) => KSh(n)} />}
+          note={`${data.arrears.length} units · oldest 63 days`}
           accent="danger"
           delay={60}
         />
         <Metric
           label="Vacant units"
-          value={<CountUp value={13} />}
+          value={<CountUp value={data.vacantUnits} />}
           note="Est. KSh 486,000 monthly loss"
           accent="ochre"
           delay={140}
@@ -81,7 +115,7 @@ function Dashboard() {
         />
         <Metric
           label="Open maintenance"
-          value={<CountUp value={3} />}
+          value={<CountUp value={data.tickets.filter((t) => t.status !== "Resolved").length} />}
           note="1 urgent · Ruaka borehole"
           delay={300}
         />
@@ -94,21 +128,21 @@ function Dashboard() {
           delay={80}
         >
           <Table
-            head={["Tenant", "Unit", "Expected", { label: "Paid", align: "right" }, "Status", ""]}
+            head={["Tenant ID", "Unit", "Expected", { label: "Paid", align: "right" }, "Status", ""]}
           >
-            {arrears.map((p) => (
-              <tr key={p.id} className="transition-colors duration-150 hover:bg-muted/50">
+            {data.arrears.map((c) => (
+              <tr key={c.id} className="transition-colors duration-150 hover:bg-muted/50">
                 <Td>
-                  <span className="font-medium">{p.tenant}</span>
-                  <span className="block text-xs text-muted-foreground">{p.property}</span>
+                  <span className="font-medium">{c.tenantId}</span>
+                  <span className="block text-xs text-muted-foreground">{c.propertyId}</span>
                 </Td>
-                <Td num>{p.unit}</Td>
-                <Td num>{KSh(p.expected)}</Td>
+                <Td num>{c.unitId}</Td>
+                <Td num>{KSh(c.totalAmount)}</Td>
                 <Td num right>
-                  {KSh(p.amount)}
+                  {KSh(c.amountPaid)}
                 </Td>
                 <Td>
-                  <Badge variant={statusVariant(p.status)}>{p.status}</Badge>
+                  <Badge variant={statusVariant(c.status)}>{c.status}</Badge>
                 </Td>
                 <Td right>
                   <span className="row-actions text-xs font-semibold text-primary">Follow up</span>
@@ -157,8 +191,8 @@ function Dashboard() {
           delay={200}
         >
           <div className="divide-y divide-border">
-            {properties.slice(0, 5).map((p) => {
-              const pct = Math.round((p.collected / p.monthlyRoll) * 100);
+            {data.props.slice(0, 5).map((p) => {
+              const pct = Math.round((p.occupiedUnits / p.totalUnits) * 100);
               return (
                 <Link
                   key={p.id}
@@ -169,7 +203,7 @@ function Dashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[13px] font-medium">{p.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {p.area} · {p.occupied}/{p.units} occupied
+                      {p.area} · {p.occupiedUnits}/{p.totalUnits} occupied
                     </p>
                   </div>
                   <div className="hidden h-1.5 w-32 overflow-hidden rounded-xs bg-muted sm:block">
@@ -195,13 +229,13 @@ function Dashboard() {
           delay={240}
         >
           <div className="divide-y divide-border">
-            {tickets.slice(0, 4).map((t) => (
+            {data.tickets.slice(0, 4).map((t) => (
               <div key={t.id} className="flex items-start gap-3 px-4 py-3">
-                <span className="t-num mt-0.5 text-[11px] text-muted-foreground">{t.ref}</span>
+                <span className="t-num mt-0.5 text-[11px] text-muted-foreground">{t.referenceNumber}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] font-medium">{t.title}</p>
                   <p className="text-xs text-muted-foreground">
-                    {t.property} · {t.unit} · raised by {t.raisedBy}
+                    {t.propertyId} · raised by {t.raisedBy}
                   </p>
                 </div>
                 <Badge variant={statusVariant(t.priority)}>{t.priority}</Badge>

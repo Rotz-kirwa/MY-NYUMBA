@@ -10,33 +10,219 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DocumentsIndexRouteImport } from './routes/documents/index'
+import { Route as ExpensesIndexRouteImport } from './routes/expenses/index'
+import { Route as LeasesIndexRouteImport } from './routes/leases/index'
+import { Route as MaintenanceIndexRouteImport } from './routes/maintenance/index'
+import { Route as MessagesIndexRouteImport } from './routes/messages/index'
+import { Route as PaymentsIndexRouteImport } from './routes/payments/index'
+import { Route as PropertiesIndexRouteImport } from './routes/properties/index'
+import { Route as PropertiesPropertyIdRouteImport } from './routes/properties/$propertyId'
+import { Route as ReportsIndexRouteImport } from './routes/reports/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as TenantsIndexRouteImport } from './routes/tenants/index'
+import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
+import { Route as UnitsIndexRouteImport } from './routes/units/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentsIndexRoute = DocumentsIndexRouteImport.update({
+  id: '/documents/',
+  path: '/documents/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpensesIndexRoute = ExpensesIndexRouteImport.update({
+  id: '/expenses/',
+  path: '/expenses/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeasesIndexRoute = LeasesIndexRouteImport.update({
+  id: '/leases/',
+  path: '/leases/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaintenanceIndexRoute = MaintenanceIndexRouteImport.update({
+  id: '/maintenance/',
+  path: '/maintenance/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesIndexRoute = MessagesIndexRouteImport.update({
+  id: '/messages/',
+  path: '/messages/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsIndexRoute = PaymentsIndexRouteImport.update({
+  id: '/payments/',
+  path: '/payments/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertiesIndexRoute = PropertiesIndexRouteImport.update({
+  id: '/properties/',
+  path: '/properties/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertiesPropertyIdRoute = PropertiesPropertyIdRouteImport.update({
+  id: '/properties/$propertyId',
+  path: '/properties/$propertyId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsIndexRoute = ReportsIndexRouteImport.update({
+  id: '/reports/',
+  path: '/reports/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TenantsIndexRoute = TenantsIndexRouteImport.update({
+  id: '/tenants/',
+  path: '/tenants/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TenantsTenantIdRoute = TenantsTenantIdRouteImport.update({
+  id: '/tenants/$tenantId',
+  path: '/tenants/$tenantId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnitsIndexRoute = UnitsIndexRouteImport.update({
+  id: '/units/',
+  path: '/units/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/properties/$propertyId': typeof PropertiesPropertyIdRoute
+  '/tenants/$tenantId': typeof TenantsTenantIdRoute
+  '/documents/': typeof DocumentsIndexRoute
+  '/expenses/': typeof ExpensesIndexRoute
+  '/leases/': typeof LeasesIndexRoute
+  '/maintenance/': typeof MaintenanceIndexRoute
+  '/messages/': typeof MessagesIndexRoute
+  '/payments/': typeof PaymentsIndexRoute
+  '/properties/': typeof PropertiesIndexRoute
+  '/reports/': typeof ReportsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/tenants/': typeof TenantsIndexRoute
+  '/units/': typeof UnitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/properties/$propertyId': typeof PropertiesPropertyIdRoute
+  '/tenants/$tenantId': typeof TenantsTenantIdRoute
+  '/documents': typeof DocumentsIndexRoute
+  '/expenses': typeof ExpensesIndexRoute
+  '/leases': typeof LeasesIndexRoute
+  '/maintenance': typeof MaintenanceIndexRoute
+  '/messages': typeof MessagesIndexRoute
+  '/payments': typeof PaymentsIndexRoute
+  '/properties': typeof PropertiesIndexRoute
+  '/reports': typeof ReportsIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/tenants': typeof TenantsIndexRoute
+  '/units': typeof UnitsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/properties/$propertyId': typeof PropertiesPropertyIdRoute
+  '/tenants/$tenantId': typeof TenantsTenantIdRoute
+  '/documents/': typeof DocumentsIndexRoute
+  '/expenses/': typeof ExpensesIndexRoute
+  '/leases/': typeof LeasesIndexRoute
+  '/maintenance/': typeof MaintenanceIndexRoute
+  '/messages/': typeof MessagesIndexRoute
+  '/payments/': typeof PaymentsIndexRoute
+  '/properties/': typeof PropertiesIndexRoute
+  '/reports/': typeof ReportsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/tenants/': typeof TenantsIndexRoute
+  '/units/': typeof UnitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/properties/$propertyId'
+    | '/tenants/$tenantId'
+    | '/documents/'
+    | '/expenses/'
+    | '/leases/'
+    | '/maintenance/'
+    | '/messages/'
+    | '/payments/'
+    | '/properties/'
+    | '/reports/'
+    | '/settings/'
+    | '/tenants/'
+    | '/units/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/properties/$propertyId'
+    | '/tenants/$tenantId'
+    | '/documents'
+    | '/expenses'
+    | '/leases'
+    | '/maintenance'
+    | '/messages'
+    | '/payments'
+    | '/properties'
+    | '/reports'
+    | '/settings'
+    | '/tenants'
+    | '/units'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/properties/$propertyId'
+    | '/tenants/$tenantId'
+    | '/documents/'
+    | '/expenses/'
+    | '/leases/'
+    | '/maintenance/'
+    | '/messages/'
+    | '/payments/'
+    | '/properties/'
+    | '/reports/'
+    | '/settings/'
+    | '/tenants/'
+    | '/units/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  PropertiesPropertyIdRoute: typeof PropertiesPropertyIdRoute
+  TenantsTenantIdRoute: typeof TenantsTenantIdRoute
+  DocumentsIndexRoute: typeof DocumentsIndexRoute
+  ExpensesIndexRoute: typeof ExpensesIndexRoute
+  LeasesIndexRoute: typeof LeasesIndexRoute
+  MaintenanceIndexRoute: typeof MaintenanceIndexRoute
+  MessagesIndexRoute: typeof MessagesIndexRoute
+  PaymentsIndexRoute: typeof PaymentsIndexRoute
+  PropertiesIndexRoute: typeof PropertiesIndexRoute
+  ReportsIndexRoute: typeof ReportsIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+  TenantsIndexRoute: typeof TenantsIndexRoute
+  UnitsIndexRoute: typeof UnitsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +234,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documents/': {
+      id: '/documents/'
+      path: '/documents'
+      fullPath: '/documents/'
+      preLoaderRoute: typeof DocumentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expenses/': {
+      id: '/expenses/'
+      path: '/expenses'
+      fullPath: '/expenses/'
+      preLoaderRoute: typeof ExpensesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leases/': {
+      id: '/leases/'
+      path: '/leases'
+      fullPath: '/leases/'
+      preLoaderRoute: typeof LeasesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maintenance/': {
+      id: '/maintenance/'
+      path: '/maintenance'
+      fullPath: '/maintenance/'
+      preLoaderRoute: typeof MaintenanceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages/': {
+      id: '/messages/'
+      path: '/messages'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof MessagesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments/': {
+      id: '/payments/'
+      path: '/payments'
+      fullPath: '/payments/'
+      preLoaderRoute: typeof PaymentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/properties/': {
+      id: '/properties/'
+      path: '/properties'
+      fullPath: '/properties/'
+      preLoaderRoute: typeof PropertiesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/properties/$propertyId': {
+      id: '/properties/$propertyId'
+      path: '/properties/$propertyId'
+      fullPath: '/properties/$propertyId'
+      preLoaderRoute: typeof PropertiesPropertyIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports/': {
+      id: '/reports/'
+      path: '/reports'
+      fullPath: '/reports/'
+      preLoaderRoute: typeof ReportsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tenants/': {
+      id: '/tenants/'
+      path: '/tenants'
+      fullPath: '/tenants/'
+      preLoaderRoute: typeof TenantsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tenants/$tenantId': {
+      id: '/tenants/$tenantId'
+      path: '/tenants/$tenantId'
+      fullPath: '/tenants/$tenantId'
+      preLoaderRoute: typeof TenantsTenantIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/units/': {
+      id: '/units/'
+      path: '/units'
+      fullPath: '/units/'
+      preLoaderRoute: typeof UnitsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  PropertiesPropertyIdRoute: PropertiesPropertyIdRoute,
+  TenantsTenantIdRoute: TenantsTenantIdRoute,
+  DocumentsIndexRoute: DocumentsIndexRoute,
+  ExpensesIndexRoute: ExpensesIndexRoute,
+  LeasesIndexRoute: LeasesIndexRoute,
+  MaintenanceIndexRoute: MaintenanceIndexRoute,
+  MessagesIndexRoute: MessagesIndexRoute,
+  PaymentsIndexRoute: PaymentsIndexRoute,
+  PropertiesIndexRoute: PropertiesIndexRoute,
+  ReportsIndexRoute: ReportsIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+  TenantsIndexRoute: TenantsIndexRoute,
+  UnitsIndexRoute: UnitsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
