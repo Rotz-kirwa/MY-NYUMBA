@@ -1,6 +1,6 @@
 import { n as createMiddleware, t as createCsrfMiddleware } from "./createCsrfMiddleware-B2To0gPJ.mjs";
 import { t as renderErrorPage } from "./ssr.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/start-RKGGYzjZ.js
+//#region node_modules/.nitro/vite/services/ssr/assets/start-CYkmDKbn.js
 function dedupeSerializationAdapters(deduped, serializationAdapters) {
 	for (let i = 0, len = serializationAdapters.length; i < len; i++) {
 		const current = serializationAdapters[i];
@@ -24,12 +24,14 @@ var createStart = (getOptions) => {
 		createMiddleware
 	};
 };
-var errorMiddleware = createMiddleware().server(async ({ next }) => {
+var errorMiddleware = createMiddleware().server(async ({ next, request }) => {
 	try {
 		return await next();
 	} catch (error) {
+		const accept = request?.headers?.get("accept") ?? "";
+		if (request?.headers?.get("x-ts-server-fn") || accept.includes("application/json")) throw error;
 		if (error != null && typeof error === "object" && "statusCode" in error) throw error;
-		console.error(error);
+		console.error("SSR Error intercepted by start.ts errorMiddleware:", error);
 		return new Response(renderErrorPage(), {
 			status: 500,
 			headers: { "content-type": "text/html; charset=utf-8" }
