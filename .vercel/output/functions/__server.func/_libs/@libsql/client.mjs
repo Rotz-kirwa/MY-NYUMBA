@@ -1,4 +1,5 @@
 import { a as __toCommonJS, i as __require, n as __esmMin, o as __toESM, r as __exportAll, t as __commonJSMin } from "../../_runtime.mjs";
+import Database from "libsql";
 import { Buffer as Buffer$1 } from "node:buffer";
 //#region node_modules/@libsql/core/lib-esm/api.js
 /** Error thrown by the client. */
@@ -7897,13 +7898,6 @@ function _createClient$2(config) {
 	else if (config.scheme === "http" || config.scheme === "https") return _createClient$3(config);
 	else throw new LibsqlError(`The client that uses Web standard APIs supports only "libsql:", "wss:", "ws:", "https:" and "http:" URLs, got ${JSON.stringify(config.scheme + ":")}. For more information, please read ${supportedUrlLink}`, "URL_SCHEME_NOT_SUPPORTED");
 }
-//#endregion
-//#region src/db/libsql-stub.ts
-var Database = class {
-	constructor() {
-		throw new Error("Native libsql C++ binding is not available in Vercel Serverless environment");
-	}
-};
 //#endregion
 //#region node_modules/@libsql/client/lib-esm/sqlite3.js
 /** @private */

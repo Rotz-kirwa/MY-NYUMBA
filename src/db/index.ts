@@ -55,13 +55,8 @@ async function getClientInstance(): Promise<Client> {
       clientInstance = createClient({ url: dbUrl });
     }
   } catch (err) {
-    console.warn("Native @libsql/client unavailable, attempting @libsql/client/web or memory fallback:", err);
-    try {
-      const { createClient } = await import("@libsql/client/web");
-      clientInstance = createClient({ url: "https://fallback.libsql.org" });
-    } catch {
-      clientInstance = dummyClient;
-    }
+    console.warn("Database client initialization warning, using dummy client:", err);
+    clientInstance = dummyClient;
   }
 
   return clientInstance;
