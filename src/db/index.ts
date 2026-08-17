@@ -21,7 +21,8 @@ function createPgClient() {
 
 export const queryClient = createPgClient();
 
-const libsqlClient = !isBrowser && !queryClient ? createLibsqlClient({ url: "file:mynyumba.db" }) : null;
+const dbPath = process.env.VERCEL ? "file:/tmp/mynyumba.db" : "file:mynyumba.db";
+const libsqlClient = !isBrowser && !queryClient ? createLibsqlClient({ url: dbPath }) : null;
 
 export const db: any = queryClient
   ? drizzlePg(queryClient, { schema })

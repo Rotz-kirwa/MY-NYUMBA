@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "NITRO_PRESET=vercel vite build",
     "build:vercel": "NITRO_PRESET=vercel vite build",
     "start": "node .output/server/index.mjs",
     "seed": "bun src/db/seed.ts || npx tsx src/db/seed.ts",
