@@ -2,15 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/mn/Shell";
 import { PageHeader, Panel, Metric } from "@/components/mn/Bits";
 import { createServerFn } from "@tanstack/react-start";
-import { getSessionContext } from "@/server/auth";
-import { FinancialService } from "@/server/services/financial.service";
+import { getSessionContext } from "@/lib/auth";
+
 import { KSh } from "@/lib/mynyumba";
 
 const getReportsData = createServerFn({ method: "GET" }).handler(async () => {
   const session = await getSessionContext();
+  const { FinancialService } = await import("@/server/services/financial.service");
   const summary = await FinancialService.getFinancialSummary(session.organizationId, session.role);
   return { summary };
 });
+
 
 export const Route = createFileRoute("/reports/")({
   loader: () => getReportsData(),

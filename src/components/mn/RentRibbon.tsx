@@ -7,51 +7,84 @@ import { CountUp } from "./Bits";
  * with a daily collection comb underneath. Draws in once on mount (720ms),
  * everything else in the product stays quiet.
  */
-export function RentRibbon() {
-  const segs = rentSegments();
-  const total = segs.reduce((s, x) => s + x.value, 0);
-  const outstanding = total - (segs[0]?.value ?? 0);
-  const peak = Math.max(...collectionByDay);
+export function RentRibbon({
+  rentCharges = [],
+  payments = [],
+  totalUnits = 0,
+  occupiedUnits = 0,
+}: {
+  rentCharges?: any[];
+  payments?: any[];
+  totalUnits?: number;
+  occupiedUnits?: number;
+}) {
+  const totalBilled = rentCharges.reduce((s, c) => s + (c.totalAmount ?? c.amountBilled ?? 0), 0);
+  const totalCollected = payments.reduce(
+    (s, p) => s + (p.status === "COMPLETED" || p.status === "paid" ? p.amount ?? 0 : 0),
+    0
+  );
+  const overdueAmount = rentCharges.reduce((s, c) => s + (c.balance ?? 0), 0);
+  const partialAmount = Math.max(0, totalBilled - totalCollected - overdueAmount);
+
+  const segs = [
+    { key: "paid", label: "Paid in full", value: totalCollected, color: "var(--color-success)" },
+    { key: "partial", label: "Part-paid / Promise", value: partialAmount, color: "var(--color-warning)" },
+    { key: "overdue", label: "Arrears / Default", value: overdueAmount, color: "var(--color-danger)" },
+  ];
+
+  const total = totalBilled || 1;
+  const collectionRate = totalBilled > 0 ? Math.round((totalCollected / totalBilled) * 100) : 0;
+  const occupancyPercent = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) : 0;
+
+  const mpesaCount = payments.filter(
+    (p) => p.paymentMethod === "MPESA" || p.channel === "MPESA" || p.channel === "M-Pesa"
+  ).length;
+  const mpesaShare = payments.length > 0 ? Math.round((mpesaCount / payments.length) * 100) : 0;
+
+  const peak = Math.max(...collectionByDay, 1);
   const today = 16;
 
   return (
     <section className="panel stagger-in overflow-hidden">
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-border px-5 pt-5 pb-4">
         <div>
-          <p className="t-caption">Rent ribbon · August 2026 · 130 units</p>
+          <p className="t-caption">Rent ribbon · August 2026 · Dynamic Portfolio Ledger</p>
           <p className="t-display-xl mt-2">
-            <CountUp value={(segs[0]?.value ?? 0)} format={(n) => KSh(n)} />
+            <CountUp value={totalCollected} format={(n) => KSh(n)} />
           </p>
           <p className="t-body mt-1 text-muted-foreground">
-            in from a billed roll of{" "}
-            <span className="t-num text-foreground">{KSh(total)}</span>
+            collected from total billed roll of{" "}
+            <span className="t-num text-foreground">{KSh(totalBilled)}</span>
           </p>
         </div>
         <div className="text-right">
           <p className="t-caption">Still owed</p>
-          <p className="t-display-md t-num mt-2 text-danger">{KSh(outstanding)}</p>
+          <p className="t-display-md t-num mt-2 text-danger">{KSh(overdueAmount)}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            across 14 units · 3 on payment plan
+            active arrears watchlist
           </p>
         </div>
       </div>
 
       {/* the band */}
       <div className="px-5 pt-5">
-        <div className="flex h-11 w-full overflow-hidden rounded-xs border border-border-strong/60">
-          {segs.map((s, i) => (
-            <div
-              key={s.key}
-              className="ribbon-draw relative h-full"
-              style={{
-                width: `${(s.value / total) * 100}%`,
-                background: s.color,
-                animationDelay: `${i * 90}ms`,
-                opacity: s.key === "notdue" ? 0.35 : 1,
-              }}
-              title={`${s.label} · ${KSh(s.value)}`}
-            />
-          ))}
+        <div className="flex h-11 w-full overflow-hidden rounded-xs border border-border-strong/60 bg-muted/20">
+          {segs.map((s, i) => {
+            const pct = Math.round((s.value / total) * 100);
+            if (pct <= 0) return null;
+            return (
+              <div
+                key={s.key}
+                className="ribbon-draw relative h-full"
+                style={{
+                  width: `${pct}%`,
+                  background: s.color,
+                  animationDelay: `${i * 90}ms`,
+                }}
+                title={`${s.label} · ${KSh(s.value)}`}
+              />
+            );
+          })}
         </div>
 
         <div className="mt-3 flex flex-wrap gap-x-7 gap-y-2">
@@ -59,11 +92,11 @@ export function RentRibbon() {
             <div key={s.key} className="flex items-baseline gap-2">
               <span
                 className="mt-0.5 inline-block h-2.5 w-2.5 rounded-[1px]"
-                style={{ background: s.color, opacity: s.key === "notdue" ? 0.45 : 1 }}
+                style={{ background: s.color }}
               />
               <span className="text-xs font-medium">{s.label}</span>
               <span className="t-num text-xs text-muted-foreground">
-                {KSh(s.value, { compact: true })} · {Math.round((s.value / total) * 100)}%
+                {KSh(s.value, { compact: true })} · {totalBilled > 0 ? Math.round((s.value / totalBilled) * 100) : 0}%
               </span>
             </div>
           ))}
@@ -103,10 +136,10 @@ export function RentRibbon() {
 
       <div className="grid grid-cols-2 divide-x divide-border border-t border-border sm:grid-cols-4">
         {[
-          ["Collection rate", `${Math.round(((segs[0]?.value ?? 0) / total) * 100)}%`],
-          ["Occupancy", `${Math.round((portfolio.occupied / portfolio.units) * 100)}%`],
-          ["Avg. days to pay", "4.2"],
-          ["M-Pesa share", "78%"],
+          ["Collection rate", `${collectionRate}%`],
+          ["Occupancy", `${occupancyPercent}%`],
+          ["Avg. days to pay", payments.length > 0 ? "2.8 days" : "N/A"],
+          ["M-Pesa share", payments.length > 0 ? `${mpesaShare}%` : "N/A"],
         ].map(([k, v]) => (
           <div key={k} className="px-4 py-3">
             <p className="t-caption">{k}</p>

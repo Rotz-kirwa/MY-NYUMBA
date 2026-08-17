@@ -29,19 +29,30 @@ export async function seedDatabase() {
     updatedAt: now,
   }).onConflictDoNothing();
 
-  // 2. Default User
-  await db.insert(s.users).values({
-    id: "usr_wanjiru",
-    organizationId: DEFAULT_ORG_ID,
-    name: "Wanjiru Kimani",
-    email: "wanjiru@mynyumba.co.ke",
-    phone: "+254 712 345 678",
-    passwordHash: "pbkdf2_hashed_secret",
-    role: "OWNER",
-    status: "ACTIVE",
-    createdAt: now,
-    updatedAt: now,
-  }).onConflictDoNothing();
+  // 2. Default System Users across Roles
+  const usersList = [
+    { id: "usr_dev", name: "Lead Developer", email: "dev@gmail.com", phone: "+254 700 136 200", role: "OWNER" },
+    { id: "usr_wanjiru", name: "Wanjiru Kimani", email: "wanjiru@mynyumba.co.ke", phone: "+254 712 345 678", role: "OWNER" },
+    { id: "usr_mwangi", name: "Joseph Mwangi", email: "mwangi@mynyumba.co.ke", phone: "+254 712 884 210", role: "PROPERTY_MANAGER" },
+    { id: "usr_accounts", name: "Accounts Dept", email: "accounts@mynyumba.co.ke", phone: "+254 720 000 111", role: "ACCOUNTANT" },
+    { id: "usr_brian", name: "Brian Otieno", email: "brian.otieno@gmail.com", phone: "+254 712 445 908", role: "TENANT" },
+  ];
+
+
+  for (const u of usersList) {
+    await db.insert(s.users).values({
+      id: u.id,
+      organizationId: DEFAULT_ORG_ID,
+      name: u.name,
+      email: u.email,
+      phone: u.phone,
+      passwordHash: "pbkdf2_hashed_secret",
+      role: u.role,
+      status: "ACTIVE",
+      createdAt: now,
+      updatedAt: now,
+    }).onConflictDoNothing();
+  }
 
   // 3. Properties
   const propList = [

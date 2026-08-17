@@ -9,7 +9,19 @@ type ServerEntry = {
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
+let tablesInitialized = false;
+
 async function getServerEntry(): Promise<ServerEntry> {
+  if (!tablesInitialized) {
+    tablesInitialized = true;
+    try {
+      const { ensureTablesExist } = await import("@/db");
+      await ensureTablesExist();
+    } catch (e) {
+      console.warn("Table initialization check completed:", e);
+    }
+  }
+
   if (!serverEntryPromise) {
     serverEntryPromise = import("@tanstack/react-start/server-entry").then(
       (m) => (m.default ?? m) as ServerEntry,

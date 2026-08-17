@@ -1,24 +1,39 @@
-import { db } from "@/db";
-import * as s from "@/db/schema";
-import { eq, and, desc } from "drizzle-orm";
 import { authorizeOrThrow, type UserRole } from "../permissions";
+import { TenantContext } from "../auth/tenant-context";
+import { FinancialRepository } from "../repositories/financial.repository";
+import { Money } from "../utils/money";
 
 export class FinancialService {
   static async getPayments(orgId: string, role: UserRole) {
     authorizeOrThrow(role, "payments:read");
-    return await db
-      .select()
-      .from(s.payments)
-      .where(eq(s.payments.organizationId, orgId))
-      .orderBy(desc(s.payments.createdAt));
+    const repo = new FinancialRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findAllPayments();
   }
 
   static async getRentCharges(orgId: string, role: UserRole) {
     authorizeOrThrow(role, "payments:read");
-    return await db
-      .select()
-      .from(s.rentCharges)
-      .where(eq(s.rentCharges.organizationId, orgId));
+    const repo = new FinancialRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findAllRentCharges();
+  }
+
+  static async getTenantRentCharges(orgId: string, tenantId: string, role: UserRole) {
+    authorizeOrThrow(role, "payments:read");
+    const repo = new FinancialRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findRentChargesByTenantId(tenantId);
+  }
+
+  static async getTenantPayments(orgId: string, tenantId: string, role: UserRole) {
+    authorizeOrThrow(role, "payments:read");
+    const repo = new FinancialRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findPaymentsByTenantId(tenantId);
   }
 
   static async getFinancialSummary(orgId: string, role: UserRole) {
@@ -27,9 +42,12 @@ export class FinancialService {
     const charges = await this.getRentCharges(orgId, role);
     const pmts = await this.getPayments(orgId, role);
 
-    const totalBilled = charges.reduce((acc, c) => acc + c.totalAmount, 0);
-    const totalCollected = pmts.reduce((acc, p) => acc + (p.status === "COMPLETED" ? p.amount : 0), 0);
-    const arrearsCarried = charges.reduce((acc, c) => acc + c.balance, 0);
+    const totalBilled = charges.reduce((acc: number, c: (typeof charges)[number]) => Money.add(acc, c.totalAmount), 0);
+    const totalCollected = pmts.reduce(
+      (acc: number, p: (typeof pmts)[number]) => Money.add(acc, p.status === "COMPLETED" ? p.amount : 0),
+      0
+    );
+    const arrearsCarried = charges.reduce((acc: number, c: (typeof charges)[number]) => Money.add(acc, c.balance), 0);
 
     return {
       billed: totalBilled,
@@ -37,6 +55,27 @@ export class FinancialService {
       arrearsCarried,
       collectionRate: totalBilled > 0 ? Math.round((totalCollected / totalBilled) * 100) : 0,
     };
+  }
+
+  static calculateLateFee(params: {
+    dueDate: string;
+    monthlyRent: number;
+    gracePeriodDays?: number;
+    lateFeePercentage?: number;
+  }): { daysOverdue: number; lateFee: number; isOverdue: boolean } {
+    const graceDays = params.gracePeriodDays ?? 5;
+    const feePct = params.lateFeePercentage ?? 5;
+    const due = new Date(params.dueDate);
+    const now = new Date();
+    const diffTime = now.getTime() - due.getTime();
+    const daysOverdue = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+    if (daysOverdue > graceDays) {
+      const lateFee = Math.round(params.monthlyRent * (feePct / 100));
+      return { daysOverdue, lateFee, isOverdue: true };
+    }
+
+    return { daysOverdue, lateFee: 0, isOverdue: daysOverdue > 0 };
   }
 
   static async recordPayment(
@@ -55,73 +94,16 @@ export class FinancialService {
     }
   ) {
     authorizeOrThrow(role, "payments:create");
+    const repo = new FinancialRepository(
+      new TenantContext({ userId, organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
 
-    const now = new Date().toISOString();
-    const pmtId = `pmt_${Date.now()}`;
-
-    // 1. Insert immutable payment record
-    await db.insert(s.payments).values({
-      id: pmtId,
-      organizationId: orgId,
-      tenantId: params.tenantId,
-      leaseId: params.leaseId,
-      unitId: params.unitId,
-      propertyId: params.propertyId,
-      amount: params.amount,
-      paymentMethod: params.paymentMethod,
-      transactionReference: params.transactionReference,
-      transactionDate: now.slice(0, 10),
-      status: "COMPLETED",
-      notes: params.notes,
+    const result = await repo.recordPaymentTransaction({
+      ...params,
+      transactionDate: new Date().toISOString().slice(0, 10),
       createdBy: userId,
-      createdAt: now,
-      updatedAt: now,
     });
 
-    // 2. Allocate payment to pending rent charges for tenant
-    const pendingCharges = await db
-      .select()
-      .from(s.rentCharges)
-      .where(
-        and(
-          eq(s.rentCharges.organizationId, orgId),
-          eq(s.rentCharges.tenantId, params.tenantId)
-        )
-      );
-
-    let remainingPayment = params.amount;
-
-    for (const charge of pendingCharges) {
-      if (remainingPayment <= 0) break;
-      if (charge.balance <= 0) continue;
-
-      const alloc = Math.min(charge.balance, remainingPayment);
-      const newBalance = charge.balance - alloc;
-      const newPaid = charge.amountPaid + alloc;
-      const newStatus = newBalance === 0 ? "PAID" : "PARTIALLY_PAID";
-
-      await db
-        .update(s.rentCharges)
-        .set({
-          amountPaid: newPaid,
-          balance: newBalance,
-          status: newStatus,
-          updatedAt: now,
-        })
-        .where(eq(s.rentCharges.id, charge.id));
-
-      await db.insert(s.paymentAllocations).values({
-        id: `alloc_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-        organizationId: orgId,
-        paymentId: pmtId,
-        rentChargeId: charge.id,
-        allocatedAmount: alloc,
-        allocatedAt: now,
-      });
-
-      remainingPayment -= alloc;
-    }
-
-    return { success: true, paymentId: pmtId };
+    return { success: true, paymentId: result.payment.id, allocationsCount: result.allocations.length };
   }
 }

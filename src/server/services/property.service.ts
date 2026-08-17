@@ -1,31 +1,39 @@
-import { db } from "@/db";
-import * as s from "@/db/schema";
-import { eq, and } from "drizzle-orm";
 import { authorizeOrThrow, type UserRole } from "../permissions";
+import { TenantContext } from "../auth/tenant-context";
+import { PropertyRepository } from "../repositories/property.repository";
+import type { properties, units } from "@/db/schema";
 
 export class PropertyService {
   static async getAllProperties(orgId: string, role: UserRole) {
     authorizeOrThrow(role, "properties:read");
-    return await db.select().from(s.properties).where(eq(s.properties.organizationId, orgId));
+    const repo = new PropertyRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findAllProperties();
   }
 
   static async getPropertyById(orgId: string, propertyId: string, role: UserRole) {
     authorizeOrThrow(role, "properties:read");
-    const [prop] = await db
-      .select()
-      .from(s.properties)
-      .where(and(eq(s.properties.organizationId, orgId), eq(s.properties.id, propertyId)));
-    return prop || null;
+    const repo = new PropertyRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findPropertyById(propertyId);
   }
 
   static async getAllUnits(orgId: string, role: UserRole) {
     authorizeOrThrow(role, "properties:read");
-    return await db.select().from(s.units).where(eq(s.units.organizationId, orgId));
+    const repo = new PropertyRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findAllUnits();
   }
 
-  static async createProperty(orgId: string, data: typeof s.properties.$inferInsert, role: UserRole) {
+  static async createProperty(orgId: string, data: typeof properties.$inferInsert, role: UserRole) {
     authorizeOrThrow(role, "properties:create");
-    await db.insert(s.properties).values({ ...data, organizationId: orgId });
-    return { success: true };
+    const repo = new PropertyRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    const created = await repo.createProperty(data);
+    return { success: true, property: created };
   }
 }

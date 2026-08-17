@@ -9,6 +9,9 @@
     "build:vercel": "NITRO_PRESET=vercel vite build",
     "start": "node .output/server/index.mjs",
     "seed": "bun src/db/seed.ts || npx tsx src/db/seed.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "npx tsx src/db/migrate.ts",
+    "test": "vitest run",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -79,6 +82,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",
@@ -87,8 +91,10 @@
     "globals": "^15.15.0",
     "nitro": "3.0.260603-beta",
     "prettier": "^3.7.3",
+    "tsx": "^4.23.12",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "^8.2.0"
+    "vite": "^8.2.0",
+    "vitest": "^4.1.10"
   }
 }

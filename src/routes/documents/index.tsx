@@ -2,14 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/mn/Shell";
 import { PageHeader, Panel, Table, Td, Badge } from "@/components/mn/Bits";
 import { createServerFn } from "@tanstack/react-start";
-import { getSessionContext } from "@/server/auth";
-import { OperationsService } from "@/server/services/operations.service";
+import { getSessionContext } from "@/lib/auth";
 
 const getDocumentsData = createServerFn({ method: "GET" }).handler(async () => {
   const session = await getSessionContext();
+  const { OperationsService } = await import("@/server/services/operations.service");
   const docs = await OperationsService.getDocuments(session.organizationId, session.role);
   return { docs };
 });
+
 
 export const Route = createFileRoute("/documents/")({
   loader: () => getDocumentsData(),
@@ -29,7 +30,7 @@ function DocumentsPage() {
 
       <Panel title="Document Vault" meta={`${docs.length} indexed files`}>
         <Table head={["Document Name", "Category", "Linked Entity", "File Size", "Uploaded At"]}>
-          {docs.map((d) => (
+          {docs.map((d: (typeof docs)[number]) => (
             <tr key={d.id} className="transition-colors duration-150 hover:bg-muted/50">
               <Td className="font-medium text-primary hover:underline">{d.name}</Td>
               <Td>

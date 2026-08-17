@@ -16,6 +16,7 @@ export type PermissionAction =
   | "tenants:read"
   | "tenants:create"
   | "tenants:update"
+  | "tenants:delete"
   | "leases:read"
   | "leases:create"
   | "leases:update"
@@ -33,7 +34,7 @@ export type PermissionAction =
 const ROLE_PERMISSIONS: Record<UserRole, PermissionAction[]> = {
   OWNER: [
     "properties:read", "properties:create", "properties:update", "properties:delete",
-    "tenants:read", "tenants:create", "tenants:update",
+    "tenants:read", "tenants:create", "tenants:update", "tenants:delete",
     "leases:read", "leases:create", "leases:update",
     "payments:read", "payments:create", "payments:reverse",
     "expenses:read", "expenses:create",
@@ -42,7 +43,7 @@ const ROLE_PERMISSIONS: Record<UserRole, PermissionAction[]> = {
   ],
   ADMIN: [
     "properties:read", "properties:create", "properties:update",
-    "tenants:read", "tenants:create", "tenants:update",
+    "tenants:read", "tenants:create", "tenants:update", "tenants:delete",
     "leases:read", "leases:create", "leases:update",
     "payments:read", "payments:create", "payments:reverse",
     "expenses:read", "expenses:create",
@@ -51,7 +52,7 @@ const ROLE_PERMISSIONS: Record<UserRole, PermissionAction[]> = {
   ],
   PROPERTY_MANAGER: [
     "properties:read", "properties:create", "properties:update",
-    "tenants:read", "tenants:create", "tenants:update",
+    "tenants:read", "tenants:create", "tenants:update", "tenants:delete",
     "leases:read", "leases:create", "leases:update",
     "payments:read", "payments:create",
     "expenses:read", "expenses:create",

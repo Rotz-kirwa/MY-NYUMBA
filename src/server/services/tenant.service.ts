@@ -1,25 +1,48 @@
-import { db } from "@/db";
-import * as s from "@/db/schema";
-import { eq, and } from "drizzle-orm";
 import { authorizeOrThrow, type UserRole } from "../permissions";
+import { TenantContext } from "../auth/tenant-context";
+import { TenantRepository } from "../repositories/tenant.repository";
+import { LeaseRepository } from "../repositories/lease.repository";
 
 export class TenantService {
   static async getAllTenants(orgId: string, role: UserRole) {
     authorizeOrThrow(role, "tenants:read");
-    return await db.select().from(s.tenants).where(eq(s.tenants.organizationId, orgId));
+    const repo = new TenantRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findAllTenants();
   }
 
   static async getTenantById(orgId: string, tenantId: string, role: UserRole) {
     authorizeOrThrow(role, "tenants:read");
-    const [tenant] = await db
-      .select()
-      .from(s.tenants)
-      .where(and(eq(s.tenants.organizationId, orgId), eq(s.tenants.id, tenantId)));
-    return tenant || null;
+    const repo = new TenantRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findTenantById(tenantId);
   }
 
   static async getAllLeases(orgId: string, role: UserRole) {
     authorizeOrThrow(role, "leases:read");
-    return await db.select().from(s.leases).where(eq(s.leases.organizationId, orgId));
+    const repo = new LeaseRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    return await repo.findAllLeases();
+  }
+
+  static async createTenant(orgId: string, data: any, role: UserRole) {
+    authorizeOrThrow(role, "tenants:create");
+    const repo = new TenantRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    const created = await repo.createTenant(data);
+    return { success: true, tenant: created };
+  }
+
+  static async deleteTenant(orgId: string, tenantId: string, role: UserRole) {
+    authorizeOrThrow(role, "tenants:delete");
+    const repo = new TenantRepository(
+      new TenantContext({ userId: "svc", organizationId: orgId, role, email: "", name: "", isAuthenticated: true })
+    );
+    const deleted = await repo.deleteTenant(tenantId);
+    return { success: true, tenant: deleted };
   }
 }

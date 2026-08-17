@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CollectionsArrearsRouteImport } from './routes/collections/arrears'
 import { Route as DocumentsIndexRouteImport } from './routes/documents/index'
 import { Route as ExpensesIndexRouteImport } from './routes/expenses/index'
 import { Route as LeasesIndexRouteImport } from './routes/leases/index'
@@ -21,6 +22,7 @@ import { Route as PropertiesIndexRouteImport } from './routes/properties/index'
 import { Route as PropertiesPropertyIdRouteImport } from './routes/properties/$propertyId'
 import { Route as ReportsIndexRouteImport } from './routes/reports/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as TenantIndexRouteImport } from './routes/tenant/index'
 import { Route as TenantsIndexRouteImport } from './routes/tenants/index'
 import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
 import { Route as UnitsIndexRouteImport } from './routes/units/index'
@@ -33,6 +35,11 @@ const IndexRoute = IndexRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsArrearsRoute = CollectionsArrearsRouteImport.update({
+  id: '/collections/arrears',
+  path: '/collections/arrears',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocumentsIndexRoute = DocumentsIndexRouteImport.update({
@@ -85,6 +92,11 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TenantIndexRoute = TenantIndexRouteImport.update({
+  id: '/tenant/',
+  path: '/tenant/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TenantsIndexRoute = TenantsIndexRouteImport.update({
   id: '/tenants/',
   path: '/tenants/',
@@ -104,6 +116,7 @@ const UnitsIndexRoute = UnitsIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/collections/arrears': typeof CollectionsArrearsRoute
   '/properties/$propertyId': typeof PropertiesPropertyIdRoute
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/documents/': typeof DocumentsIndexRoute
@@ -115,12 +128,14 @@ export interface FileRoutesByFullPath {
   '/properties/': typeof PropertiesIndexRoute
   '/reports/': typeof ReportsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/tenant/': typeof TenantIndexRoute
   '/tenants/': typeof TenantsIndexRoute
   '/units/': typeof UnitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/collections/arrears': typeof CollectionsArrearsRoute
   '/properties/$propertyId': typeof PropertiesPropertyIdRoute
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/documents': typeof DocumentsIndexRoute
@@ -132,6 +147,7 @@ export interface FileRoutesByTo {
   '/properties': typeof PropertiesIndexRoute
   '/reports': typeof ReportsIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/tenant': typeof TenantIndexRoute
   '/tenants': typeof TenantsIndexRoute
   '/units': typeof UnitsIndexRoute
 }
@@ -139,6 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/collections/arrears': typeof CollectionsArrearsRoute
   '/properties/$propertyId': typeof PropertiesPropertyIdRoute
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/documents/': typeof DocumentsIndexRoute
@@ -150,6 +167,7 @@ export interface FileRoutesById {
   '/properties/': typeof PropertiesIndexRoute
   '/reports/': typeof ReportsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/tenant/': typeof TenantIndexRoute
   '/tenants/': typeof TenantsIndexRoute
   '/units/': typeof UnitsIndexRoute
 }
@@ -158,6 +176,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/collections/arrears'
     | '/properties/$propertyId'
     | '/tenants/$tenantId'
     | '/documents/'
@@ -169,12 +188,14 @@ export interface FileRouteTypes {
     | '/properties/'
     | '/reports/'
     | '/settings/'
+    | '/tenant/'
     | '/tenants/'
     | '/units/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
+    | '/collections/arrears'
     | '/properties/$propertyId'
     | '/tenants/$tenantId'
     | '/documents'
@@ -186,12 +207,14 @@ export interface FileRouteTypes {
     | '/properties'
     | '/reports'
     | '/settings'
+    | '/tenant'
     | '/tenants'
     | '/units'
   id:
     | '__root__'
     | '/'
     | '/login'
+    | '/collections/arrears'
     | '/properties/$propertyId'
     | '/tenants/$tenantId'
     | '/documents/'
@@ -203,6 +226,7 @@ export interface FileRouteTypes {
     | '/properties/'
     | '/reports/'
     | '/settings/'
+    | '/tenant/'
     | '/tenants/'
     | '/units/'
   fileRoutesById: FileRoutesById
@@ -210,6 +234,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  CollectionsArrearsRoute: typeof CollectionsArrearsRoute
   PropertiesPropertyIdRoute: typeof PropertiesPropertyIdRoute
   TenantsTenantIdRoute: typeof TenantsTenantIdRoute
   DocumentsIndexRoute: typeof DocumentsIndexRoute
@@ -221,6 +246,7 @@ export interface RootRouteChildren {
   PropertiesIndexRoute: typeof PropertiesIndexRoute
   ReportsIndexRoute: typeof ReportsIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
+  TenantIndexRoute: typeof TenantIndexRoute
   TenantsIndexRoute: typeof TenantsIndexRoute
   UnitsIndexRoute: typeof UnitsIndexRoute
 }
@@ -239,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/arrears': {
+      id: '/collections/arrears'
+      path: '/collections/arrears'
+      fullPath: '/collections/arrears'
+      preLoaderRoute: typeof CollectionsArrearsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/documents/': {
@@ -311,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tenant/': {
+      id: '/tenant/'
+      path: '/tenant'
+      fullPath: '/tenant/'
+      preLoaderRoute: typeof TenantIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tenants/': {
       id: '/tenants/'
       path: '/tenants'
@@ -338,6 +378,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  CollectionsArrearsRoute: CollectionsArrearsRoute,
   PropertiesPropertyIdRoute: PropertiesPropertyIdRoute,
   TenantsTenantIdRoute: TenantsTenantIdRoute,
   DocumentsIndexRoute: DocumentsIndexRoute,
@@ -349,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   PropertiesIndexRoute: PropertiesIndexRoute,
   ReportsIndexRoute: ReportsIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
+  TenantIndexRoute: TenantIndexRoute,
   TenantsIndexRoute: TenantsIndexRoute,
   UnitsIndexRoute: UnitsIndexRoute,
 }

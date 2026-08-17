@@ -25,7 +25,7 @@ const errorMiddleware = createMiddleware().server(async ({ next, request }) => {
 });
 
 const csrfMiddleware = createCsrfMiddleware({
-  filter: (ctx) => process.env.NODE_ENV === "production" && ctx.handlerType === "serverFn",
+  filter: (ctx) => process.env["NODE_ENV"] === "production" && ctx.handlerType === "serverFn",
 });
 
 export const startInstance = createStart(() => ({
