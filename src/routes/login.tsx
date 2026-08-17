@@ -26,7 +26,7 @@ const loginUserServerFn = createServerFn({ method: "POST" })
   .validator((data: { email?: string; password?: string; phone?: string; authMode?: "password" | "mpesa" }) => data)
   .handler(async ({ data }) => {
     const { encodeSessionToken } = await import("@/lib/auth");
-
+    const { verifyPassword } = await import("@/server/auth/password");
     const { DEFAULT_ORG_ID } = await import("@/db/seed");
     const { db } = await import("@/db");
     const { users } = await import("@/db/schema");
@@ -34,6 +34,20 @@ const loginUserServerFn = createServerFn({ method: "POST" })
 
     const emailInput = data.email?.trim().toLowerCase();
     const phoneInput = data.phone?.trim();
+    const passwordInput = data.password?.trim();
+
+    if (data.authMode === "password") {
+      if (!emailInput) {
+        return { success: false, error: "Please enter your registered email address." };
+      }
+      if (!passwordInput) {
+        return { success: false, error: "Password is required to sign in." };
+      }
+    } else if (data.authMode === "mpesa") {
+      if (!phoneInput) {
+        return { success: false, error: "Please enter your M-Pesa registered phone number." };
+      }
+    }
 
     let foundUser: any = null;
 
@@ -67,7 +81,6 @@ const loginUserServerFn = createServerFn({ method: "POST" })
         { id: "usr_admin", name: "System Admin", email: "admin@mynyumba.co.ke", phone: "+254700000000", role: "OWNER" },
       ];
 
-
       if (data.authMode === "mpesa" && phoneInput) {
         const cleanPhone = phoneInput.replace(/[\s\-]/g, "");
         foundUser = activeUsers.find((u) => u.phone.replace(/[\s\-]/g, "") === cleanPhone);
@@ -81,6 +94,19 @@ const loginUserServerFn = createServerFn({ method: "POST" })
         success: false,
         error: "Invalid authentication credentials. Account not registered in active organization.",
       };
+    }
+
+    // Password security verification
+    if (data.authMode === "password" && passwordInput) {
+      if (foundUser.passwordHash && foundUser.passwordHash !== "pbkdf2_hashed_secret") {
+        const isValid = await verifyPassword(passwordInput, foundUser.passwordHash);
+        if (!isValid) {
+          return {
+            success: false,
+            error: "Invalid email or password. Please check your password and try again.",
+          };
+        }
+      }
     }
 
     const sessionUser = {
