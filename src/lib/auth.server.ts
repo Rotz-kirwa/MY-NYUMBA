@@ -50,25 +50,6 @@ export async function getSessionContextServer(request?: Request): Promise<Sessio
   if (sessionToken) {
     const decoded = decodeSessionToken(sessionToken);
     if (decoded && decoded.email && decoded.role) {
-      try {
-        const { db } = await import("@/db");
-        const { users } = await import("@/db/schema");
-        const { eq } = await import("drizzle-orm");
-        if (db) {
-          const dbUser = await db.select().from(users).where(eq(users.email, decoded.email));
-          if (dbUser.length > 0) {
-            return {
-              id: dbUser[0].id,
-              organizationId: dbUser[0].organizationId,
-              name: dbUser[0].name,
-              email: dbUser[0].email,
-              role: dbUser[0].role as UserRole,
-            };
-          }
-        }
-      } catch (e) {
-        // DB lookup fallback to token
-      }
       return decoded;
     }
   }
