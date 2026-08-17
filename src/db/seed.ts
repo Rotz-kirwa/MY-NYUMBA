@@ -327,3 +327,8 @@ export async function seedDatabase() {
 
   console.log("✅ My Nyumba Nairobi portfolio successfully seeded into relational database.");
 }
+
+if (process.argv[1]?.endsWith("seed.ts")) {
+  seedDatabase().then(() => process.exit(0)).catch((err) => { console.error(err); process.exit(1); });
+}
+
