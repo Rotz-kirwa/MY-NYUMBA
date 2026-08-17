@@ -26,7 +26,7 @@ export default defineConfig({
       },
     }),
     nitro({
-      defaultPreset: "cloudflare-module",
+      preset: process.env.NITRO_PRESET || "node-server",
     }),
     react(),
   ],
